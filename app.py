@@ -40,7 +40,7 @@ class User:
         self.chat_history = chat_history or []
         self.products_bought = products_bought or []
 
-
+    # To register a new user
     @classmethod
     def create(cls, username, password):
         hashed_pw = generate_password_hash(password)
@@ -52,7 +52,7 @@ class User:
         conn.close()
         return cls(user_id, username, hashed_pw)    
 
-
+     # To retrieve an existing user from the database by username.
     @classmethod
     def get_by_username(cls, username):
         conn = sqlite3.connect('users.db')
@@ -144,9 +144,9 @@ system_prompt = """
       - Be helpful and polite
       """
 # Define the company and agent details
-company_name = "TechElectronics"
+company_name = "Proptelligence"
 company_business = "Consumer Electronics Retailer"
-agent_name = "Alex"
+agent_name = "Proptelligence"
 key_features = "Cutting-edge technology, Competitive pricing, Excellent customer service"
 
 # Format the system prompt with the company and agent details
@@ -171,7 +171,7 @@ agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 # --- Streamlit UI ---
 def main():
-    st.title(f"{company_name} AI Sales Assistant 🤖")
+    st.title(f"{company_name} AI Sales Assistant ")
     
     # Initialize session state
     if 'user' not in st.session_state:
@@ -190,6 +190,7 @@ def main():
                 if st.form_submit_button("Login"):
                     user = User.get_by_username(username)
                     if user and check_password_hash(user.password, password):
+                        # If valid, the user is stored in st.session_state.user and their chat history is loaded.
                         st.session_state.user = user
                         st.session_state.chat_history = user.chat_history
                         st.rerun()
@@ -225,7 +226,6 @@ def main():
 
         if prompt := st.chat_input("Type you Message here..."):
             #Add user message to chat
-
             with st.chat_message("user"):
                 st.write(prompt)
 
@@ -248,9 +248,10 @@ def main():
                 {"type": "human", "content": prompt},
                 {"type": "ai", "content": response}
             ]
+            # Both the user’s message and the assistant’s reply are appended to the persistent chat history 
+            # (both in session and in the database), ensuring conversation continuity.
             st.session_state.user.update_chat_history(new_messages)
             st.session_state.chat_history += new_messages
 
 if __name__ == "__main__":
-    main()    
-                    
+    main() 
